@@ -123,3 +123,4 @@ app.*.symbols
 .claude
 web-bundles
 .env
+docs/ENGLISH_CORRECTIONS.md
