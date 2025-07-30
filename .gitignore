@@ -119,4 +119,7 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 
 # Environment Variables
+.bmad-core
+.claude
+web-bundles
 .env
