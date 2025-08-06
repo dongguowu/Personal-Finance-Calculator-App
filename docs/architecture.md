@@ -33,6 +33,8 @@ The application adheres to a **Clean Architecture / Layered Architecture** patte
 |  Platform/External  |  (sqflite, http, OS services) - Concrete implementations of external technologies.
 \+---------------------+
 
+**Presentation Layer & State Management:** The top layer contains the UI Widgets. To keep them simple, we use a **Riverpod Notifier** which acts as a ViewModel. This separates the UI from the application's state and logic. It orchestrates the data flow, isolates UI from business rules, and makes both much easier to test independently.
+
 ```
 
 **Module Structure (`lib/` directory):**
@@ -601,28 +603,15 @@ Use Cases (also known as Interactors) encapsulate the specific business rules an
     (Performs the mathematical calculation based on provided inputs.)
     ```dart
     import 'dart:math';
+    import '../entities/loan_calculation.dart';
 
     class CalculateLoanPaymentUseCase {
-      // All money-related inputs/outputs are assumed to be in cents, except interestRate (percentage)
-      // Returns monthly payment in double (cents), which will be rounded for display.
-      double call({
+      LoanCalculation execute({
         required int loanAmountCents,
-        required double annualInterestRate, // e.g., 3.0 for 3%
+        required double annualInterestRate,
         required int loanTermYears,
       }) {
-        if (loanAmountCents <= 0 || loanTermYears <= 0) return 0.0;
-        if (annualInterestRate < 0) return 0.0; // Invalid, or could throw specific exception
-
-        final double monthlyInterestRate = (annualInterestRate / 100.0) / 12.0;
-        final int numberOfPayments = loanTermYears * 12;
-
-        if (monthlyInterestRate == 0) {
-          return (loanAmountCents / numberOfPayments).roundToDouble();
-        } else {
-          return loanAmountCents *
-              (monthlyInterestRate * pow(1 + monthlyInterestRate, numberOfPayments)) /
-              (pow(1 + monthlyInterestRate, numberOfPayments) - 1);
-        }
+        // ... implementation details ...
       }
     }
     ```
@@ -649,7 +638,10 @@ Use Cases (also known as Interactors) encapsulate the specific business rules an
         required double annualInterestRate,
         required int investmentPeriodYears,
       }) {
-        if (initialInvestmentCents < 0 || regularContributionCents < 0 || annualInterestRate < 0 || investmentPeriodYears <= 0) {
+        if (initialInvestmentCents < 0 || initialInvestmentCents >= 9900000000 ||
+            regularContributionCents < 0 || regularContributionCents >= 9900000000 ||
+            annualInterestRate < 0 || annualInterestRate >= 100 ||
+            investmentPeriodYears <= 0 || investmentPeriodYears > 50) {
           throw ArgumentError('Invalid input for investment calculation');
         }
 

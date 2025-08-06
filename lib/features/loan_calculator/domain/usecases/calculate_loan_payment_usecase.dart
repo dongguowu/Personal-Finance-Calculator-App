@@ -9,30 +9,30 @@ class CalculateLoanPaymentUseCase {
   /// Returns a [LoanCalculation] with all calculated values.
   /// If inputs are invalid, returns a calculation with zero values.
   /// 
-  /// [loanAmountDollars] - Principal loan amount in dollars
+  /// [loanAmountCents] - Principal loan amount in cents
   /// [annualInterestRate] - Annual interest rate as percentage (e.g., 5.25)
   /// [loanTermYears] - Loan term in years
   LoanCalculation execute({
-    required double loanAmountDollars,
+    required int loanAmountCents,
     required double annualInterestRate,
     required int loanTermYears,
   }) {
     // Input validation
-    if (loanAmountDollars <= 0 || annualInterestRate < 0 || loanTermYears <= 0) {
+    if (loanAmountCents <= 0 || annualInterestRate < 0 || loanTermYears <= 0) {
       return _createZeroCalculation(
-        loanAmountDollars: loanAmountDollars,
+        loanAmountCents: loanAmountCents,
         annualInterestRate: annualInterestRate,
         loanTermYears: loanTermYears,
       );
     }
 
     // Convert loan amount to cents for precision
-    final loanAmountCents = (loanAmountDollars * 100).round();
+    final loanAmountCentsBig = BigInt.from(loanAmountCents);
 
     // Handle zero interest rate case
     if (annualInterestRate == 0) {
       return _calculateZeroInterestLoan(
-        loanAmountCents: loanAmountCents,
+        loanAmountCents: loanAmountCentsBig,
         annualInterestRate: annualInterestRate,
         loanTermYears: loanTermYears,
       );
@@ -48,12 +48,12 @@ class CalculateLoanPaymentUseCase {
 
   /// Creates a LoanCalculation with zero values for invalid inputs
   LoanCalculation _createZeroCalculation({
-    required double loanAmountDollars,
+    required int loanAmountCents,
     required double annualInterestRate,
     required int loanTermYears,
   }) {
     return LoanCalculation(
-      loanAmountCents: (loanAmountDollars * 100).round(),
+      loanAmountCents: loanAmountCents,
       annualInterestRate: annualInterestRate,
       loanTermYears: loanTermYears,
       monthlyPaymentCents: 0,
@@ -64,20 +64,20 @@ class CalculateLoanPaymentUseCase {
 
   /// Calculates loan payment for zero interest rate
   LoanCalculation _calculateZeroInterestLoan({
-    required int loanAmountCents,
+    required BigInt loanAmountCents,
     required double annualInterestRate,
     required int loanTermYears,
   }) {
     final totalMonths = loanTermYears * 12;
-    final monthlyPaymentCents = (loanAmountCents / totalMonths).round();
-    
+    final monthlyPaymentCents = (loanAmountCents / BigInt.from(totalMonths));
+
     return LoanCalculation(
-      loanAmountCents: loanAmountCents,
+      loanAmountCents: loanAmountCents.toInt(),
       annualInterestRate: annualInterestRate,
       loanTermYears: loanTermYears,
-      monthlyPaymentCents: monthlyPaymentCents,
+      monthlyPaymentCents: monthlyPaymentCents.toInt(),
       totalInterestCents: 0,
-      totalRepaymentCents: loanAmountCents,
+      totalRepaymentCents: loanAmountCents.toInt(),
     );
   }
 
@@ -90,15 +90,14 @@ class CalculateLoanPaymentUseCase {
     // Convert to monthly interest rate and number of payments
     final monthlyInterestRate = annualInterestRate / 100 / 12;
     final totalMonths = loanTermYears * 12;
-    
-    // Calculate monthly payment using standard loan formula:
+
     // M = P * [r(1+r)^n] / [(1+r)^n - 1]
-    // where M = monthly payment, P = principal, r = monthly rate, n = months
+    // where M = monthly payment, P = principal in cents, r = monthly rate, n = months
     final rateCompounded = pow(1 + monthlyInterestRate, totalMonths);
-    final monthlyPaymentDollars = (loanAmountCents / 100) * 
-        (monthlyInterestRate * rateCompounded) / 
+    final monthlyPaymentDollars = (loanAmountCents / 100) *
+        (monthlyInterestRate * rateCompounded) /
         (rateCompounded - 1);
-    
+
     final totalRepaymentCents = (monthlyPaymentDollars * totalMonths * 100).round();
     final monthlyPaymentCents = (totalRepaymentCents / totalMonths).round();
     final totalInterestCents = totalRepaymentCents - loanAmountCents;

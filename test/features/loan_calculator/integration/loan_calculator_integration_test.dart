@@ -324,8 +324,20 @@ void main() {
         await tester.pump();
 
         // Assert - Should calculate with decimal precision
-        expect(find.textContaining('\$'), findsNWidgets(3));
-        expect(find.textContaining('CAD'), findsNWidgets(3));
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('loan_result_display')),
+            matching: find.textContaining('\$'),
+          ),
+          findsNWidgets(3),
+        );
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('loan_result_display')),
+            matching: find.textContaining('CAD'),
+          ),
+          findsNWidgets(3),
+        );
         expect(tester.takeException(), isNull);
       });
     });

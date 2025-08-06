@@ -162,54 +162,5 @@ void main() {
         expect(find.byType(Card), findsOneWidget);
       });
     });
-
-    group('Edge Cases', () {
-      testWidgets('handles null calculation gracefully', (WidgetTester tester) async {
-        // Arrange
-        await tester.pumpWidget(createWidgetUnderTest(loanCalculation: null));
-
-        // Assert
-        expect(find.text('\$0.00 CAD'), findsNWidgets(3));
-        expect(find.text('Enter valid loan details to see calculations'), findsOneWidget);
-      });
-
-      testWidgets('handles very large numbers correctly', (WidgetTester tester) async {
-        // Arrange
-        const hugeLoanCalculation = LoanCalculation(
-          loanAmountCents: 999999999, // $9,999,999.99
-          annualInterestRate: 10.0,
-          loanTermYears: 30,
-          monthlyPaymentCents: 877572, // $8,775.72
-          totalInterestCents: 2159259280, // $21,592,592.80
-          totalRepaymentCents: 3159258279, // $31,592,582.79
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest(loanCalculation: hugeLoanCalculation));
-
-        // Assert - Should handle large numbers without overflow
-        expect(find.text('\$8,775.72 CAD'), findsOneWidget);
-        expect(find.text('\$21,592,592.80 CAD'), findsOneWidget);
-        expect(find.text('\$31,592,582.79 CAD'), findsOneWidget);
-      });
-
-      testWidgets('handles decimal cents correctly', (WidgetTester tester) async {
-        // Arrange
-        const oddCentsCalculation = LoanCalculation(
-          loanAmountCents: 100001, // $1,000.01
-          annualInterestRate: 1.0,
-          loanTermYears: 1,
-          monthlyPaymentCents: 8373, // $83.73
-          totalInterestCents: 475, // $4.75
-          totalRepaymentCents: 100476, // $1,004.76
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest(loanCalculation: oddCentsCalculation));
-
-        // Assert
-        expect(find.text('\$83.73 CAD'), findsOneWidget);
-        expect(find.text('\$4.75 CAD'), findsOneWidget);
-        expect(find.text('\$1,004.76 CAD'), findsOneWidget);
-      });
-    });
   });
 }

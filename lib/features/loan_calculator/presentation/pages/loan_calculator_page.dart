@@ -33,8 +33,9 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
     int? loanTermYears,
   }) {
     setState(() {
+      final loanAmountCents = (loanAmount != null) ? (loanAmount * 100).toInt() : 0;
       _currentCalculation = _calculateLoanPaymentUseCase.execute(
-        loanAmountDollars: loanAmount ?? 0,
+        loanAmountCents: loanAmountCents,
         annualInterestRate: annualInterestRate ?? 0,
         loanTermYears: loanTermYears ?? 0,
       );
@@ -58,9 +59,13 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             ),
             
             // Loan Result Display
-            LoanResultDisplay(
-              loanCalculation: _currentCalculation,
-            ),
+            if (_currentCalculation.monthlyPaymentCents > 0)
+              RepaintBoundary(
+                child: LoanResultDisplay(
+                  key: const Key('loan_result_display'),
+                  loanCalculation: _currentCalculation,
+                ),
+              ),
             
             // Additional spacing at bottom for better UX
             const SizedBox(height: 32),

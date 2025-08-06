@@ -6,25 +6,28 @@ import '../../domain/entities/loan_calculation.dart';
 /// total interest paid, and total repayment amount.
 class LoanResultDisplay extends StatelessWidget {
   /// The loan calculation results to display
-  final LoanCalculation loanCalculation;
+  final LoanCalculation? loanCalculation;
 
   const LoanResultDisplay({
     super.key,
-    required this.loanCalculation,
+    this.loanCalculation,
   });
 
   /// Formats a dollar amount as currency with CAD suffix
-  String _formatCurrency(double amount) {
+  String _formatCurrency(int amountCents) {
     final formatter = NumberFormat.currency(
       locale: 'en_CA',
       symbol: '\$',
       decimalDigits: 2,
     );
-    return '${formatter.format(amount)} CAD';
+    return '${formatter.format(amountCents / 100)} CAD';
   }
 
   @override
   Widget build(BuildContext context) {
+    final showHelpText =
+        loanCalculation == null || loanCalculation!.monthlyPaymentCents == 0;
+
     return Card(
       margin: const EdgeInsets.all(16.0),
       child: Padding(
@@ -37,11 +40,10 @@ class LoanResultDisplay extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 16),
-            
             // Monthly Payment
             _ResultRow(
               label: 'Monthly Payment',
-              value: _formatCurrency(loanCalculation.monthlyPaymentDollars),
+              value: _formatCurrency(loanCalculation?.monthlyPaymentCents ?? 0),
               icon: Icons.payment,
               valueStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
@@ -49,29 +51,29 @@ class LoanResultDisplay extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            
+
             // Total Interest Paid
             _ResultRow(
               label: 'Total Interest Paid',
-              value: _formatCurrency(loanCalculation.totalInterestDollars),
+              value: _formatCurrency(loanCalculation?.totalInterestCents ?? 0),
               icon: Icons.trending_up,
               valueStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Theme.of(context).colorScheme.secondary,
               ),
             ),
             const SizedBox(height: 12),
-            
+
             // Total Repayment
             _ResultRow(
               label: 'Total Repayment',
-              value: _formatCurrency(loanCalculation.totalRepaymentDollars),
+              value: _formatCurrency(loanCalculation?.totalRepaymentCents ?? 0),
               icon: Icons.account_balance_wallet,
               valueStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Theme.of(context).colorScheme.tertiary,
               ),
             ),
-            
-            if (loanCalculation.monthlyPaymentCents == 0)
+
+            if (showHelpText)
               const Padding(
                 padding: EdgeInsets.only(top: 16.0),
                 child: Text(
