@@ -15,7 +15,7 @@ class CalculateLoanPaymentUseCase {
   LoanCalculation execute({
     required int loanAmountCents,
     required double annualInterestRate,
-    required int loanTermYears,
+    required int loanTermYears, required double loanAmountDollars,
   }) {
     // Input validation
     if (loanAmountCents <= 0 || annualInterestRate < 0 || loanTermYears <= 0) {

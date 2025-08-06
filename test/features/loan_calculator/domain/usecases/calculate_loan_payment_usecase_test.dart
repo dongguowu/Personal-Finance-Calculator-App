@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:personal_finance_calculator/features/loan_calculator/domain/entities/loan_calculation.dart';
 import 'package:personal_finance_calculator/features/loan_calculator/domain/usecases/calculate_loan_payment_usecase.dart';
 
 void main() {
@@ -19,7 +18,7 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
@@ -28,11 +27,12 @@ void main() {
         expect(result.loanAmountCents, equals(10000000)); // $100,000 in cents
         expect(result.annualInterestRate, equals(5.0));
         expect(result.loanTermYears, equals(30));
-        
+
         // Monthly payment should be approximately $536.82
         expect(result.monthlyPaymentCents, inInclusiveRange(53680, 53685));
         expect(result.totalInterestCents, greaterThan(0));
-        expect(result.totalRepaymentCents, equals(result.loanAmountCents + result.totalInterestCents));
+        expect(result.totalRepaymentCents,
+            equals(result.loanAmountCents + result.totalInterestCents));
       });
 
       test('handles zero interest rate correctly', () {
@@ -43,7 +43,7 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
@@ -52,7 +52,7 @@ void main() {
         expect(result.loanAmountCents, equals(12000000));
         expect(result.annualInterestRate, equals(0.0));
         expect(result.totalInterestCents, equals(0));
-        
+
         // Monthly payment should be loan amount / total months
         final expectedMonthlyPayment = (12000000 / (10 * 12)).round();
         expect(result.monthlyPaymentCents, equals(expectedMonthlyPayment));
@@ -67,7 +67,7 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
@@ -86,7 +86,7 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
@@ -105,7 +105,7 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
@@ -124,7 +124,7 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
@@ -143,7 +143,7 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
@@ -152,7 +152,8 @@ void main() {
         expect(result.loanAmountCents, equals(5000000));
         expect(result.annualInterestRate, equals(15.0));
         expect(result.loanTermYears, equals(5));
-        expect(result.monthlyPaymentCents, greaterThan(100000)); // > $1000/month
+        expect(
+            result.monthlyPaymentCents, greaterThan(100000)); // > $1000/month
         expect(result.totalInterestCents, greaterThan(0));
       });
 
@@ -164,7 +165,7 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
@@ -185,13 +186,14 @@ void main() {
 
         // Act
         final result = useCase.execute(
-          loanAmountDollars: loanAmount,
+          loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
         );
 
         // Assert
-        expect(result.loanAmountCents, equals(15000099)); // Rounded to nearest cent
+        expect(result.loanAmountCents,
+            equals(15000099)); // Rounded to nearest cent
         expect(result.annualInterestRate, equals(4.25));
         expect(result.monthlyPaymentCents, greaterThan(0));
         expect(result.totalRepaymentCents, greaterThan(result.loanAmountCents));
