@@ -22,6 +22,7 @@ In addition to the user stories, the MVP must adhere to the following technical 
 *   **Platform:** The application must be built with Flutter (v3.24.0+) and Dart (v3.8.0+), ensuring compatibility with both Android and iOS from a single codebase.
 *   **User Interface:** The UI will be built using Google's Material Design 3 component library, ensuring a modern and consistent user experience.
 *   **Data Persistence:** User-saved calculations will be stored locally on the device using an `sqflite` database.
+*   **Accessibility:** The application will aim to meet WCAG 2.1 AA standards, ensuring it is usable by people with disabilities. This includes support for screen readers and sufficient color contrast.
 
 ---
 

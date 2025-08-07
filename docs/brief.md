@@ -45,4 +45,12 @@ The project will be supported by a comprehensive testing strategy to ensure code
 *   **Unit Tests:** For business logic and individual functions.
 *   **Widget Tests:** To verify UI components in isolation.
 *   **Integration Tests:** To ensure seamless interaction between different parts of the app.
-*   This multi-layered approach guarantees that the application is reliable, maintainable, and performs as expected.
+## 6. Security & Operational Considerations
+
+To ensure the application is robust and secure, the following areas will be addressed post-MVP as part of the production readiness roadmap:
+
+*   **Local Data Encryption:** The local `sqflite` database will be encrypted to protect sensitive user data.
+*   **Secure API Key Management:** API keys will be managed securely using compile-time variables, preventing them from being exposed in the codebase.
+*   **Crash Reporting:** A monitoring service will be integrated to detect and diagnose production issues promptly.
+*   **API Resilience:** A retry policy will be implemented for API calls to handle transient network issues gracefully.
+
