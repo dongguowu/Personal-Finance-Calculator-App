@@ -4,6 +4,16 @@ This file contains project-specific conventions, configurations, and important i
 
 ---
 
+## Core Project Documents
+
+The following three documents are the primary source of truth for this project. Always consult them before making changes to ensure alignment with the project's goals, architecture, and requirements.
+
+*   **`docs/brief.md`:** The high-level project overview, goals, and technology stack.
+*   **`docs/PRD.md`:** The detailed product requirements, user stories, and acceptance criteria.
+*   **`docs/architecture.md`:** The technical blueprint, including the layered architecture, module structure, and coding patterns.
+
+---
+
 ## Git Settings
 
 *   **includeCoAuthoredBy:** false - Do not add the "Co-Authored-By" trailer to git commits.
