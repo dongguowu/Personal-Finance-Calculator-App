@@ -1,7 +1,7 @@
 # Personal Finance Calculator App: Project Brief (MVP)
 
-**Version:** 1.0
-**Date:** July 30, 2025
+**Version:** 1.1
+**Date:** July 31, 2025
 
 ---
 
@@ -18,44 +18,23 @@ The first release of the application will focus on the following core functional
 3.  **Bank Rates Display Screen:** Provides access to current (or near real-time) Canadian bank interest rates for various financial products.
 4.  **History Screen:** A centralized place for users to view, search, recall, and manage all their previously saved loan and investment calculations.
 
-## 3. Core Technologies
+## 3. Core Technologies & Packages
 
-The application will be developed using a modern and robust technology stack:
+The application will be developed using a modern and robust technology stack and packages:
 
 * **Framework:** Flutter (Latest Stable)
 * **Language:** Dart (Latest Stable)
 * **UI/UX:** Material Design 3 (Flutter's built-in components)
 * **State Management:** Riverpod (`riverpod_annotation`, `flutter_riverpod`)
+* **ViewModel:** Riverpod Notifier(with code generation approach (@riverpod))
 * **Local Database:** `sqflite` (for persistent storage of calculations)
 * **Network Requests:** `http` (for fetching bank rates from an external API)
 * **Routing:** `AutoRoute` (for declarative and type-safe navigation)
 * **Data Classes/Immutability:** `freezed` and `freezed_annotation` (for creating immutable data models)
 * **JSON Serialization:** `json_serializable` and `json_annotation` (for efficient JSON parsing)
 
-**`pubspec.yaml` implications (key packages):**
 
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.6
-  flutter_riverpod: ^latest_version # e.g., ^2.5.1
-  riverpod_annotation: ^latest_version # e.g., ^2.3.0
-  sqflite: ^latest_version # e.g., ^2.3.2
-  path: ^latest_version # e.g., ^1.9.0
-  http: ^latest_version # e.g., ^1.2.1
-  freezed_annotation: ^latest_version # e.g., ^2.4.0
-  json_annotation: ^latest_version # e.g., ^4.9.0
-  auto_route: ^latest_version # e.g., ^7.9.0
-  intl: ^latest_version # For currency formatting e.g., ^0.18.1
+## 4. No floating-point errors when dealing with money
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^latest_version # e.g., ^3.0.0
-  build_runner: ^latest_version # e.g., ^2.4.8
-  riverpod_generator: ^latest_version # e.g., ^2.3.0
-  freezed: ^latest_version # e.g., ^2.4.7
-  json_serializable: ^latest_version # e.g., ^6.7.1
-  auto_route_generator: ^latest_version # e.g., ^7.3.2
-  mockito: ^latest_version # e.g., ^5.4.4
+**Crucial Decision:** All money-related values will be stored and processed as **`int` (integers representing cents)** to mitigate floating-point inaccuracies.
+Use **int** for money values (stored as **cents**) instead of double to avoid floating-point precision issues

@@ -5,8 +5,8 @@
 ```markdown
 # Personal Finance Calculator App: Product Requirements Document (PRD)
 
-**Version:** 1.0
-**Date:** July 30, 2025
+**Version:** 1.1
+**Date:** August 06, 2025
 **Prepared by:** Gemini (Acting as Product Owner)
 
 ---
