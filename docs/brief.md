@@ -1,7 +1,7 @@
 # Personal Finance Calculator App: Project Brief (MVP)
 
-**Version:** 1.1
-**Date:** July 31, 2025
+**Version:** 1.2
+**Date:** August 07, 2025
 
 ---
 
@@ -18,23 +18,31 @@ The first release of the application will focus on the following core functional
 3.  **Bank Rates Display Screen:** Provides access to current (or near real-time) Canadian bank interest rates for various financial products.
 4.  **History Screen:** A centralized place for users to view, search, recall, and manage all their previously saved loan and investment calculations.
 
-## 3. Core Technologies & Packages
+## 3. Core Technologies & External Dependencies
 
-The application will be developed using a modern and robust technology stack and packages:
+The application will be developed using a modern and robust technology stack:
 
-* **Framework:** Flutter (Latest Stable)
-* **Language:** Dart (Latest Stable)
-* **UI/UX:** Material Design 3 (Flutter's built-in components)
-* **State Management:** Riverpod (`riverpod_annotation`, `flutter_riverpod`)
-* **ViewModel:** Riverpod Notifier(with code generation approach (@riverpod))
-* **Local Database:** `sqflite` (for persistent storage of calculations)
-* **Network Requests:** `http` (for fetching bank rates from an external API)
-* **Routing:** `AutoRoute` (for declarative and type-safe navigation)
-* **Data Classes/Immutability:** `freezed` and `freezed_annotation` (for creating immutable data models)
-* **JSON Serialization:** `json_serializable` and `json_annotation` (for efficient JSON parsing)
+*   **Framework:** Flutter (v3.24.0 or higher)
+*   **Language:** Dart (v3.8.0 or higher)
+*   **Linting:** `very_good_analysis` for maintaining high-quality code standards.
+*   **UI/UX:** Material Design 3 (Flutter's built-in components). No external design mockups are required for the MVP.
+*   **State Management:** Riverpod (`riverpod_annotation`, `flutter_riverpod`)
+*   **ViewModel:** Riverpod Notifier (with code generation approach, i.e., `@riverpod`)
+*   **Local Database:** `sqflite` for persistent storage of user calculations.
+*   **Network Requests:** `http` for fetching data.
+*   **Bank Rates API:** Sourced from the Bank of Canada's Valet API: `https://www.bankofcanada.ca/valet/`.
+*   **Routing:** `AutoRoute` for declarative and type-safe navigation.
+*   **Data Classes/Immutability:** `freezed` and `freezed_annotation` for creating immutable data models.
+*   **JSON Serialization:** `json_serializable` and `json_annotation` for efficient JSON parsing.
 
+## 4. Monetary Value Handling
 
-## 4. No floating-point errors when dealing with money
+To ensure financial accuracy and avoid floating-point errors, all monetary values will be handled as integers representing cents. A dedicated `MoneyCents` class will be implemented for this purpose, encapsulating all related logic and preventing precision issues throughout the application.
 
-**Crucial Decision:** All money-related values will be stored and processed as **`int` (integers representing cents)** to mitigate floating-point inaccuracies.
-Use **int** for money values (stored as **cents**) instead of double to avoid floating-point precision issues
+## 5. Quality Assurance
+
+The project will be supported by a comprehensive testing strategy to ensure code quality and application stability. This includes:
+*   **Unit Tests:** For business logic and individual functions.
+*   **Widget Tests:** To verify UI components in isolation.
+*   **Integration Tests:** To ensure seamless interaction between different parts of the app.
+*   This multi-layered approach guarantees that the application is reliable, maintainable, and performs as expected.
