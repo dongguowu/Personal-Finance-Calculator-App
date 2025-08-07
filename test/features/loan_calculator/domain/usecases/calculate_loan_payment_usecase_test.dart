@@ -21,6 +21,7 @@ void main() {
           loanAmountCents: (loanAmount * 100).toInt(),
           annualInterestRate: annualInterestRate,
           loanTermYears: loanTermYears,
+          loanAmountDollars: 0,
         );
 
         // Assert

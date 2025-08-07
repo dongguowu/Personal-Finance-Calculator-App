@@ -16,7 +16,7 @@ class LoanCalculatorPage extends StatefulWidget {
 
 class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
   final _calculateLoanPaymentUseCase = CalculateLoanPaymentUseCase();
-  
+
   LoanCalculation _currentCalculation = const LoanCalculation(
     loanAmountCents: 0,
     annualInterestRate: 0,
@@ -33,11 +33,13 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
     int? loanTermYears,
   }) {
     setState(() {
-      final loanAmountCents = (loanAmount != null) ? (loanAmount * 100).toInt() : 0;
+      final loanAmountCents =
+          (loanAmount != null) ? (loanAmount * 100).toInt() : 0;
       _currentCalculation = _calculateLoanPaymentUseCase.execute(
         loanAmountCents: loanAmountCents,
         annualInterestRate: annualInterestRate ?? 0,
         loanTermYears: loanTermYears ?? 0,
+        loanAmountDollars: 0,
       );
     });
   }
@@ -57,7 +59,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
             LoanInputForm(
               onInputChanged: _onInputChanged,
             ),
-            
+
             // Loan Result Display
             if (_currentCalculation.monthlyPaymentCents > 0)
               RepaintBoundary(
@@ -66,7 +68,7 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
                   loanCalculation: _currentCalculation,
                 ),
               ),
-            
+
             // Additional spacing at bottom for better UX
             const SizedBox(height: 32),
           ],
