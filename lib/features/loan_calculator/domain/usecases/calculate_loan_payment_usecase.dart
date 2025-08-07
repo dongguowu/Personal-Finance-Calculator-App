@@ -1,114 +1,54 @@
+import 'package:personal_finance_calculator/core/share/money_cents.dart';
+import 'package:personal_finance_calculator/features/loan_calculator/domain/entities/loan_calculation.dart';
 import 'dart:math';
-import '../entities/loan_calculation.dart';
 
-/// Use case for calculating loan payment details including monthly payment,
-/// total interest, and total repayment amount.
 class CalculateLoanPaymentUseCase {
-  /// Calculates loan payment details from input parameters.
-  /// 
-  /// Returns a [LoanCalculation] with all calculated values.
-  /// If inputs are invalid, returns a calculation with zero values.
-  /// 
-  /// [loanAmountCents] - Principal loan amount in cents
-  /// [annualInterestRate] - Annual interest rate as percentage (e.g., 5.25)
-  /// [loanTermYears] - Loan term in years
-  LoanCalculation execute({
-    required int loanAmountCents,
+  LoanCalculation call({
+    required MoneyCents loanAmount,
     required double annualInterestRate,
-    required int loanTermYears, required double loanAmountDollars,
+    required int loanTermInYears,
   }) {
-    // Input validation
-    if (loanAmountCents <= 0 || annualInterestRate < 0 || loanTermYears <= 0) {
-      return _createZeroCalculation(
-        loanAmountCents: loanAmountCents,
+    if (loanAmount.cents <= 0 || annualInterestRate < 0 || loanTermInYears <= 0) {
+      return LoanCalculation(
+        loanAmount: loanAmount,
         annualInterestRate: annualInterestRate,
-        loanTermYears: loanTermYears,
+        loanTermInYears: loanTermInYears,
+        monthlyPayment: MoneyCents.zero,
+        totalInterestPaid: MoneyCents.zero,
+        totalRepayment: MoneyCents.zero,
       );
     }
 
-    // Convert loan amount to cents for precision
-    final loanAmountCentsBig = BigInt.from(loanAmountCents);
+    final double monthlyInterestRate = annualInterestRate / 12 / 100;
+    final int numberOfPayments = loanTermInYears * 12;
 
-    // Handle zero interest rate case
-    if (annualInterestRate == 0) {
-      return _calculateZeroInterestLoan(
-        loanAmountCents: loanAmountCentsBig,
+    if (monthlyInterestRate == 0) {
+      final monthlyPayment = loanAmount ~/ numberOfPayments;
+      return LoanCalculation(
+        loanAmount: loanAmount,
         annualInterestRate: annualInterestRate,
-        loanTermYears: loanTermYears,
+        loanTermInYears: loanTermInYears,
+        monthlyPayment: monthlyPayment,
+        totalInterestPaid: MoneyCents.zero,
+        totalRepayment: loanAmount,
       );
     }
+    
+    final double monthlyPaymentValue = loanAmount.dollars *
+        (monthlyInterestRate * pow(1 + monthlyInterestRate, numberOfPayments)) /
+        (pow(1 + monthlyInterestRate, numberOfPayments) - 1);
 
-    // Standard loan calculation with interest
-    return _calculateStandardLoan(
-      loanAmountCents: loanAmountCents,
-      annualInterestRate: annualInterestRate,
-      loanTermYears: loanTermYears,
-    );
-  }
-
-  /// Creates a LoanCalculation with zero values for invalid inputs
-  LoanCalculation _createZeroCalculation({
-    required int loanAmountCents,
-    required double annualInterestRate,
-    required int loanTermYears,
-  }) {
-    return LoanCalculation(
-      loanAmountCents: loanAmountCents,
-      annualInterestRate: annualInterestRate,
-      loanTermYears: loanTermYears,
-      monthlyPaymentCents: 0,
-      totalInterestCents: 0,
-      totalRepaymentCents: 0,
-    );
-  }
-
-  /// Calculates loan payment for zero interest rate
-  LoanCalculation _calculateZeroInterestLoan({
-    required BigInt loanAmountCents,
-    required double annualInterestRate,
-    required int loanTermYears,
-  }) {
-    final totalMonths = loanTermYears * 12;
-    final monthlyPaymentCents = (loanAmountCents / BigInt.from(totalMonths));
+    final monthlyPayment = MoneyCents.fromDollars(monthlyPaymentValue);
+    final totalRepayment = monthlyPayment * numberOfPayments;
+    final totalInterestPaid = totalRepayment - loanAmount;
 
     return LoanCalculation(
-      loanAmountCents: loanAmountCents.toInt(),
+      loanAmount: loanAmount,
       annualInterestRate: annualInterestRate,
-      loanTermYears: loanTermYears,
-      monthlyPaymentCents: monthlyPaymentCents.toInt(),
-      totalInterestCents: 0,
-      totalRepaymentCents: loanAmountCents.toInt(),
-    );
-  }
-
-  /// Calculates standard loan payment with interest using the standard formula
-  LoanCalculation _calculateStandardLoan({
-    required int loanAmountCents,
-    required double annualInterestRate,
-    required int loanTermYears,
-  }) {
-    // Convert to monthly interest rate and number of payments
-    final monthlyInterestRate = annualInterestRate / 100 / 12;
-    final totalMonths = loanTermYears * 12;
-
-    // M = P * [r(1+r)^n] / [(1+r)^n - 1]
-    // where M = monthly payment, P = principal in cents, r = monthly rate, n = months
-    final rateCompounded = pow(1 + monthlyInterestRate, totalMonths);
-    final monthlyPaymentDollars = (loanAmountCents / 100) *
-        (monthlyInterestRate * rateCompounded) /
-        (rateCompounded - 1);
-
-    final totalRepaymentCents = (monthlyPaymentDollars * totalMonths * 100).round();
-    final monthlyPaymentCents = (totalRepaymentCents / totalMonths).round();
-    final totalInterestCents = totalRepaymentCents - loanAmountCents;
-
-    return LoanCalculation(
-      loanAmountCents: loanAmountCents,
-      annualInterestRate: annualInterestRate,
-      loanTermYears: loanTermYears,
-      monthlyPaymentCents: monthlyPaymentCents,
-      totalInterestCents: totalInterestCents,
-      totalRepaymentCents: totalRepaymentCents,
+      loanTermInYears: loanTermInYears,
+      monthlyPayment: monthlyPayment,
+      totalInterestPaid: totalInterestPaid,
+      totalRepayment: totalRepayment,
     );
   }
 }

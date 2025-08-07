@@ -1,51 +1,16 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import '../widgets/loan_input_form.dart';
-import '../widgets/loan_result_display.dart';
-import '../../domain/entities/loan_calculation.dart';
-import '../../domain/usecases/calculate_loan_payment_usecase.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:personal_finance_calculator/features/loan_calculator/presentation/providers/loan_calculator_provider.dart';
+import 'package:personal_finance_calculator/features/loan_calculator/presentation/widgets/loan_input_form.dart';
+import 'package:personal_finance_calculator/features/loan_calculator/presentation/widgets/loan_result_display.dart';
 
-/// Main page for the loan calculator feature.
-/// Integrates the input form and result display widgets and handles
-/// the loan calculation logic.
-class LoanCalculatorPage extends StatefulWidget {
+@RoutePage()
+class LoanCalculatorPage extends ConsumerWidget {
   const LoanCalculatorPage({super.key});
 
   @override
-  State<LoanCalculatorPage> createState() => _LoanCalculatorPageState();
-}
-
-class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
-  final _calculateLoanPaymentUseCase = CalculateLoanPaymentUseCase();
-
-  LoanCalculation _currentCalculation = const LoanCalculation(
-    loanAmountCents: 0,
-    annualInterestRate: 0,
-    loanTermYears: 0,
-    monthlyPaymentCents: 0,
-    totalInterestCents: 0,
-    totalRepaymentCents: 0,
-  );
-
-  /// Handles input changes from the loan input form and recalculates results
-  void _onInputChanged({
-    double? loanAmount,
-    double? annualInterestRate,
-    int? loanTermYears,
-  }) {
-    setState(() {
-      final loanAmountCents =
-          (loanAmount != null) ? (loanAmount * 100).toInt() : 0;
-      _currentCalculation = _calculateLoanPaymentUseCase.execute(
-        loanAmountCents: loanAmountCents,
-        annualInterestRate: annualInterestRate ?? 0,
-        loanTermYears: loanTermYears ?? 0,
-        loanAmountDollars: 0,
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Loan Calculator'),
@@ -55,21 +20,20 @@ class _LoanCalculatorPageState extends State<LoanCalculatorPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Loan Input Form
             LoanInputForm(
-              onInputChanged: _onInputChanged,
+              onInputChanged: ({
+                double? loanAmount,
+                double? annualInterestRate,
+                int? loanTermYears,
+              }) {
+                ref.read(loanCalculatorProvider.notifier).calculate(
+                      loanAmount: loanAmount ?? 0,
+                      annualInterestRate: annualInterestRate ?? 0,
+                      loanTermInYears: loanTermYears ?? 0,
+                    );
+              },
             ),
-
-            // Loan Result Display
-            if (_currentCalculation.monthlyPaymentCents > 0)
-              RepaintBoundary(
-                child: LoanResultDisplay(
-                  key: const Key('loan_result_display'),
-                  loanCalculation: _currentCalculation,
-                ),
-              ),
-
-            // Additional spacing at bottom for better UX
+            const LoanResultDisplay(),
             const SizedBox(height: 32),
           ],
         ),

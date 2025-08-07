@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:personal_finance_calculator/features/loan_calculator/domain/entities/loan_calculation.dart';
+import 'package:personal_finance_calculator/features/investment_calculator/domain/entities/investment_calculation.dart';
 import 'package:personal_finance_calculator/core/share/money_cents.dart';
-import 'package:personal_finance_calculator/features/loan_calculator/presentation/providers/loan_calculator_provider.dart';
+import 'package:personal_finance_calculator/features/investment_calculator/presentation/providers/investment_calculator_provider.dart';
 
-class LoanResultDisplay extends ConsumerWidget {
-  const LoanResultDisplay({super.key});
+class InvestmentResultDisplay extends ConsumerWidget {
+  const InvestmentResultDisplay({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LoanCalculation? loanCalculation = ref.watch(loanCalculatorProvider);
+    final InvestmentCalculation? investmentCalculation = ref.watch(investmentCalculatorProvider);
 
     final showHelpText =
-        loanCalculation == null || loanCalculation.monthlyPayment == MoneyCents.zero;
+        investmentCalculation == null || investmentCalculation.futureValue == MoneyCents.zero;
 
     return Card(
       margin: const EdgeInsets.all(16.0),
@@ -27,9 +27,9 @@ class LoanResultDisplay extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             _ResultRow(
-              label: 'Monthly Payment',
-              value: loanCalculation?.monthlyPayment.toFormattedCurrency() ?? MoneyCents.zero.toFormattedCurrency(),
-              icon: Icons.payment,
+              label: 'Future Value',
+              value: investmentCalculation?.futureValue.toFormattedCurrency() ?? MoneyCents.zero.toFormattedCurrency(),
+              icon: Icons.show_chart,
               valueStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -37,18 +37,18 @@ class LoanResultDisplay extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             _ResultRow(
-              label: 'Total Interest Paid',
-              value: loanCalculation?.totalInterestPaid.toFormattedCurrency() ?? MoneyCents.zero.toFormattedCurrency(),
-              icon: Icons.trending_up,
+              label: 'Total Contributions',
+              value: investmentCalculation?.totalContributions.toFormattedCurrency() ?? MoneyCents.zero.toFormattedCurrency(),
+              icon: Icons.add_circle_outline,
               valueStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Theme.of(context).colorScheme.secondary,
                   ),
             ),
             const SizedBox(height: 12),
             _ResultRow(
-              label: 'Total Repayment',
-              value: loanCalculation?.totalRepayment.toFormattedCurrency() ?? MoneyCents.zero.toFormattedCurrency(),
-              icon: Icons.account_balance_wallet,
+              label: 'Total Earnings',
+              value: investmentCalculation?.totalEarnings.toFormattedCurrency() ?? MoneyCents.zero.toFormattedCurrency(),
+              icon: Icons.trending_up,
               valueStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Theme.of(context).colorScheme.tertiary,
                   ),
@@ -57,7 +57,7 @@ class LoanResultDisplay extends ConsumerWidget {
               const Padding(
                 padding: EdgeInsets.only(top: 16.0),
                 child: Text(
-                  'Enter valid loan details to see calculations',
+                  'Enter valid investment details to see calculations',
                   style: TextStyle(
                     fontStyle: FontStyle.italic,
                     color: Colors.grey,

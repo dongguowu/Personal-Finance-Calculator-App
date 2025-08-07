@@ -2,42 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoanInputForm extends ConsumerStatefulWidget {
+class InvestmentInputForm extends ConsumerStatefulWidget {
   final Function({
-    double? loanAmount,
+    double? initialInvestment,
+    double? regularContribution,
+    String? contributionFrequency,
     double? annualInterestRate,
-    int? loanTermYears,
+    int? investmentPeriodInYears,
   }) onInputChanged;
 
-  const LoanInputForm({
+  const InvestmentInputForm({
     super.key,
     required this.onInputChanged,
   });
 
   @override
-  ConsumerState<LoanInputForm> createState() => _LoanInputFormState();
+  ConsumerState<InvestmentInputForm> createState() => _InvestmentInputFormState();
 }
 
-class _LoanInputFormState extends ConsumerState<LoanInputForm> {
+class _InvestmentInputFormState extends ConsumerState<InvestmentInputForm> {
   final _formKey = GlobalKey<FormState>();
 
-  double? _loanAmount;
+  double? _initialInvestment;
+  double? _regularContribution;
+  String? _contributionFrequency = 'monthly';
   double? _annualInterestRate;
-  int? _loanTermYears;
+  int? _investmentPeriodInYears;
 
   void _notifyInputChanged() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       widget.onInputChanged(
-        loanAmount: _loanAmount,
+        initialInvestment: _initialInvestment,
+        regularContribution: _regularContribution,
+        contributionFrequency: _contributionFrequency,
         annualInterestRate: _annualInterestRate,
-        loanTermYears: _loanTermYears,
+        investmentPeriodInYears: _investmentPeriodInYears,
       );
     } else {
       widget.onInputChanged(
-        loanAmount: 0,
+        initialInvestment: 0,
+        regularContribution: 0,
+        contributionFrequency: 'monthly',
         annualInterestRate: 0,
-        loanTermYears: 0,
+        investmentPeriodInYears: 0,
       );
     }
   }
@@ -55,7 +63,7 @@ class _LoanInputFormState extends ConsumerState<LoanInputForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Loan Details',
+                'Investment Details',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 16),
@@ -65,23 +73,66 @@ class _LoanInputFormState extends ConsumerState<LoanInputForm> {
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
                 ],
                 decoration: const InputDecoration(
-                  labelText: 'Loan Amount',
+                  labelText: 'Initial Investment',
                   prefixText: '\$ ',
                   suffixText: 'CAD',
                   border: OutlineInputBorder(),
-                  helperText: 'Enter the total loan amount',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a loan amount';
+                    return 'Please enter an amount';
                   }
                   final amount = double.tryParse(value);
-                  if (amount == null || amount <= 0) {
-                    return 'Loan amount must be greater than 0';
+                  if (amount == null || amount < 0) {
+                    return 'Amount must be 0 or greater';
                   }
                   return null;
                 },
-                onSaved: (value) => _loanAmount = double.tryParse(value!),
+                onSaved: (value) => _initialInvestment = double.tryParse(value!),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Regular Contribution',
+                  prefixText: '\$ ',
+                  suffixText: 'CAD',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter an amount';
+                  }
+                  final amount = double.tryParse(value);
+                  if (amount == null || amount < 0) {
+                    return 'Amount must be 0 or greater';
+                  }
+                  return null;
+                },
+                onSaved: (value) =>
+                    _regularContribution = double.tryParse(value!),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _contributionFrequency,
+                decoration: const InputDecoration(
+                  labelText: 'Contribution Frequency',
+                  border: OutlineInputBorder(),
+                ),
+                items: ['monthly', 'quarterly', 'annually']
+                    .map((label) => DropdownMenuItem(
+                          child: Text(label),
+                          value: label,
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _contributionFrequency = value;
+                  });
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -93,15 +144,14 @@ class _LoanInputFormState extends ConsumerState<LoanInputForm> {
                   labelText: 'Annual Interest Rate',
                   suffixText: '%',
                   border: OutlineInputBorder(),
-                  helperText: 'Enter the annual interest rate (e.g., 5.25)',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter an interest rate';
+                    return 'Please enter a rate';
                   }
                   final rate = double.tryParse(value);
                   if (rate == null || rate < 0) {
-                    return 'Interest rate must be 0 or greater';
+                    return 'Rate must be 0 or greater';
                   }
                   return null;
                 },
@@ -115,22 +165,22 @@ class _LoanInputFormState extends ConsumerState<LoanInputForm> {
                   FilteringTextInputFormatter.digitsOnly,
                 ],
                 decoration: const InputDecoration(
-                  labelText: 'Loan Term',
+                  labelText: 'Investment Period',
                   suffixText: 'Years',
                   border: OutlineInputBorder(),
-                  helperText: 'Enter the loan term in years',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a loan term';
+                    return 'Please enter a period';
                   }
                   final term = int.tryParse(value);
                   if (term == null || term <= 0) {
-                    return 'Loan term must be greater than 0';
+                    return 'Period must be greater than 0';
                   }
                   return null;
                 },
-                onSaved: (value) => _loanTermYears = int.tryParse(value!),
+                onSaved: (value) =>
+                    _investmentPeriodInYears = int.tryParse(value!),
               ),
             ],
           ),
